@@ -29,13 +29,13 @@ def olisort_challenge() -> Tuple[bool, str, str]:
     return passed, str(expected), str(player_result)
 
 def Gavin_Riggins_challange():
-        # helper function to generate test cases
+        # helper functios to generate test cases
         def remove_pieces(board):
+            from random import randint; 
             BOARD_SIZE = len(board)
             IGNORED_PIECES = ["KG"]
             COUNT_PER_LINE_PIECES_TO_REMOVE = [2, 6]
 
-            from random import randint; from math import ceil
             removed_pieces = []
             selected_pieces = []
             w_points = 39
@@ -48,25 +48,45 @@ def Gavin_Riggins_challange():
 
                 # select indexes to remove
                 for i in range(0, amount_to_displace):
-                    if i > BOARD_SIZE: i = BOARD_SIZE
                     selected_piece = column[i]
+                    if randint(COUNT_PER_LINE_PIECES_TO_REMOVE[0], COUNT_PER_LINE_PIECES_TO_REMOVE[1]) == selected_piece: continue
                     if selected_piece == None: continue
-                    
+
+
                     formatted_piece = str.split(selected_piece, "_")
                     player = formatted_piece[0]; piece = formatted_piece[1]
 
                     # ignore the chosen piece if it exists in the IGNORED_PIECES list. 
                     if piece in IGNORED_PIECES: continue
 
-                    list.append(selected_pieces, i)
+                    selected_pieces.append(i)
+                #   actual removal
+                for index in selected_pieces:
+                    if column[index] == None: continue
 
-                  # actual removal
-                  for index in selected_pieces:
-                     board[index] = 0
-
-            return remove_pieces
-              
+                    removed_pieces.append(column[index])
+                    column[index] = None
                 
+            return board, removed_pieces
+              
+        # Places a piece on a random spot on the board. 
+        def destribute_pieces(pieces, board, randomRemovalCount = 0):
+            from random import randint; 
+            BOARD_SIZE  = len(board)
+            x = 0; y = 0
+
+            for piece in pieces:
+                while True:
+                    if randomRemovalCount != 0 and randint(0, randomRemovalCount) == 1: continue
+                    x = randint(0, BOARD_SIZE - 1)
+                    y = randint(0, BOARD_SIZE - 1)
+
+                    if board[y][x] == None: break
+
+                board[y][x] = piece
+
+            return board
+
         board_start = [
             ["b_RK", "b_KT", "b_BP", "b_QN", "b_KG", "b_BS", "b_KT", "b_RK",], # H
             ["b_PN", "b_PN", "b_PN", "b_PN", "b_PN", "b_PN", "b_PN", "b_PN",], # G
@@ -78,6 +98,17 @@ def Gavin_Riggins_challange():
             ["w_RK", "w_KT", "w_BS", "w_QN", "w_KG", "w_BS", "w_KT", "w_RK",], # A
             #1     2     3     4     5     6     7     8
         ]
-        print(remove_pieces(board_start))
+
+        # Logic to suffle the board
+        killed_pieces = remove_pieces(board_start) # removes pieces, returns board & list of removed
+
+        board = killed_pieces[0]
+        peice_list = killed_pieces[1]
+        
+        final_board = destribute_pieces(peice_list, board, 0) # destributes pieces from killed pieces & returns updated board
+        
+        print("\nBOARD SUFFLED")
+        for collumn in final_board:
+            print(collumn)
 
 Gavin_Riggins_challange()
